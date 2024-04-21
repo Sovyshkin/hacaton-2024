@@ -21,6 +21,13 @@ export default defineComponent({
       faculty: [{ counter: 1, depart: [""], name: "" }],
       status: "",
       message: "",
+      name: "",
+      desc: "",
+      date: "",
+      place: "",
+      types: ["Спорт", "Наука", "Творчество", "Волонтёрство"],
+      typeevent: "",
+      vuzid: "",
     };
   },
   methods: {
@@ -44,10 +51,13 @@ export default defineComponent({
         let file = this.files[i];
         formData.append("files", file);
       }
+      formData.append("vuzid", this.vuzid);
+      formData.append("name", this.name);
+      formData.append("place", this.place);
+      formData.append("date", this.date);
       formData.append("desc", this.desc);
-      formData.append("hash", this.hash);
-      formData.append("userid", this.getCookieValue("id"));
-      let response = await axios.post(`/new-entry`, formData, {
+      formData.append("typeevent", this.typeevent);
+      let response = await axios.post(`/publish_event`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -55,20 +65,22 @@ export default defineComponent({
       this.status = response.data.status;
       this.message = response.data.message;
       setTimeout(() => {
-        this.$router.push({ name: "profile" });
+        this.$router.go(-1);
       }, 3000);
     },
     url(file) {
       return URL.createObjectURL(file);
     },
   },
-  async mounted() {},
+  async mounted() {
+    this.vuzid = this.$route.query.id;
+  },
 });
 </script>
 
 <template>
   <div class="wrapper">
-    <h1>Публикация записи</h1>
+    <h1>Публикация мероприятия</h1>
     <form @submit.prevent="submitFiles">
       <div class="wrapper-for-form">
         <div class="col1">
@@ -77,6 +89,7 @@ export default defineComponent({
               type="file"
               ref="files"
               id="file"
+              multiple
               v-on:change="handleFilesUpload"
             />
             <label v-if="files == `` && img == ``" for="file">
@@ -108,9 +121,6 @@ export default defineComponent({
                 <div class="carousel__item">
                   <div class="imgCross">
                     <img :src="`/assets/` + slide" alt="" />
-                    <button @click="remove(slide)" class="cross">
-                      <ion-icon name="close-outline"></ion-icon>
-                    </button>
                   </div>
                 </div>
               </Slide>
@@ -123,6 +133,45 @@ export default defineComponent({
           </div>
         </div>
         <div class="col1">
+          <div class="input-group">
+            <div class="title">Название:</div>
+            <div class="wrapper-for-input">
+              <input
+                v-model="name"
+                type="text"
+                name="cityto"
+                class="form-input cityto"
+                required
+                id=""
+              />
+            </div>
+          </div>
+          <div class="input-group">
+            <div class="title">Место проведения:</div>
+            <div class="wrapper-for-input">
+              <input
+                v-model="place"
+                type="text"
+                name="cityto"
+                class="form-input cityto"
+                required
+                id=""
+              />
+            </div>
+          </div>
+          <div class="input-group">
+            <div class="title">Дата:</div>
+            <div class="wrapper-for-input">
+              <input
+                v-model="date"
+                type="date"
+                name="cityto"
+                class="form-input cityto"
+                required
+                id=""
+              />
+            </div>
+          </div>
           <div class="input-group">
             <div class="title">Описание:</div>
             <div class="wrapper-for-input">
@@ -137,16 +186,20 @@ export default defineComponent({
             </div>
           </div>
           <div class="input-group">
-            <div class="title">Хэштэги:</div>
+            <div class="title">Тип:</div>
             <div class="wrapper-for-input">
-              <textarea
-                v-model="hash"
+              <select
+                v-model="typeevent"
                 type="text"
                 name="cityto"
                 class="form-input cityto"
                 required
                 id=""
-              />
+              >
+                <option :value="item" v-for="item in types" :key="item">
+                  {{ item }}
+                </option>
+              </select>
             </div>
           </div>
         </div>
@@ -336,6 +389,7 @@ form {
 }
 
 .wrapper-for-input {
+  flex: 60%;
   width: 50%;
 }
 
@@ -349,7 +403,8 @@ form {
 .title {
   color: black;
   line-height: 19px !important;
-  text-align: end;
+  text-align: start;
+  flex: 10%;
 
   transition: color 300ms;
 }
@@ -519,6 +574,12 @@ select {
 @media (max-width: 420px) {
   .container {
     display: flex;
+  }
+}
+
+@media (max-width: 570px) {
+  .input-group {
+    flex-direction: column;
   }
 }
 

@@ -6,6 +6,11 @@ import AppProfile from "@/components/AppProfile.vue";
 import CreateVuz from "@/components/CreateVuz.vue";
 import CreateNews from "@/components/CreateNews.vue";
 import AppEntry from "@/components/AppEntry.vue";
+import ProfileVuz from "@/components/ProfileVuz.vue";
+import PublishEvent from "@/components/PublishEvent.vue";
+import AppEvent from "@/components/AppEvent.vue";
+import AppLenta from "@/components/AppLenta.vue";
+import EvenstLenta from "@/components/EventsLenta.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -44,6 +49,34 @@ const router = createRouter({
       path: "/entry",
       name: "entry",
       component: AppEntry,
+    },
+    {
+      path: "/vuz",
+      name: "vuz",
+      component: ProfileVuz,
+    },
+    {
+      path: "/publish_event",
+      name: "publishevent",
+      component: PublishEvent,
+    },
+    {
+      path: "/event",
+      name: "event",
+      component: AppEvent,
+      props: true,
+    },
+    {
+      path: "/lenta",
+      name: "lenta",
+      component: AppLenta,
+      props: true,
+    },
+    {
+      path: "/events",
+      name: "events",
+      component: EvenstLenta,
+      props: true,
     },
   ],
 });

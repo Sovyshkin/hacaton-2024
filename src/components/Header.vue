@@ -1,4 +1,5 @@
 <script>
+import axios from "axios";
 export default {
   name: "AppHeader",
   components: {},
@@ -6,6 +7,8 @@ export default {
     return {
       target: 0,
       id: this.getCookieValue("id"),
+      vuz: "",
+      adminvuz: false,
     };
   },
   methods: {
@@ -18,14 +21,49 @@ export default {
     goHome() {
       this.$router.push({ name: "home" });
     },
-    goVuz() {
-      this.$router.push({ name: "vuzregister" });
+    async goVuz() {
+      this.id = this.getCookieValue("id");
+      if (this.id) {
+        let response = await axios.post(`/info-profile`, {
+          params: {
+            id: this.id,
+          },
+        });
+        if (response.data.typeuser == "создатель вуза") {
+          let res = await axios.post(`/get_vuz`, {
+            params: {
+              userid: this.id,
+              namevuz: "False",
+              id: "False",
+            },
+          });
+          console.log("id", res.data.id);
+          this.$router.push({
+            name: "vuz",
+            query: { id: res.data.id, edit: true },
+          });
+        } else {
+          this.$router.push({
+            name: "reg",
+            query: {
+              type: "vuz",
+            },
+          });
+        }
+      } else {
+        this.$router.push({
+          name: "reg",
+          query: {
+            type: "vuz",
+          },
+        });
+      }
     },
     goStudent() {
-      this.$router.push({ name: "" });
+      this.$router.push({ name: "reg" });
     },
     goPred() {
-      this.$router.push({ name: "" });
+      this.$router.push({ name: "reg" });
     },
     getCookieValue(name) {
       const cookies = document.cookie.split("; ");
@@ -38,8 +76,21 @@ export default {
       }
       return res;
     },
+    async getUser() {
+      let response = await axios.post(`/info-profile`, {
+        params: {
+          id: this.getCookieValue("id"),
+        },
+      });
+      let type = response.data.typeuser;
+      if (type == "создатель вуза") {
+        this.adminvuz = true;
+      }
+    },
   },
-  mounted() {},
+  mounted() {
+    this.getUser();
+  },
 };
 </script>
 <template>
@@ -48,9 +99,34 @@ export default {
       <div @click="goHome" class="logo">
         <img src="../assets/LOGO.png" alt="Лого" />
       </div>
-      <div @click="goVuz" class="nav-item nav-small">ВУЗам</div>
-      <div @click="goPred" class="nav-item nav-small">Предприятиям</div>
-      <div @click="goStudent" class="nav-item nav-small">Студентам</div>
+      <div @click="goVuz" v-if="!id" class="nav-item nav-small">ВУЗам</div>
+      <div @click="goPred" v-if="!id" class="nav-item nav-small">
+        Предприятиям
+      </div>
+      <div
+        @click="this.$router.push({ name: 'lenta' })"
+        v-if="id"
+        class="nav-item nav-small"
+      >
+        Лента
+      </div>
+      <div
+        @click="this.$router.push({ name: 'events' })"
+        v-if="id"
+        class="nav-item nav-small"
+      >
+        Мероприятия
+      </div>
+      <div
+        @click="this.$router.push({ name: 'vuz' })"
+        v-if="adminvuz"
+        class="nav-item nav-small"
+      >
+        Мой ВУЗ
+      </div>
+      <div @click="goStudent" v-if="!id" class="nav-item nav-small">
+        Студентам
+      </div>
     </div>
     <div class="auth" v-if="!id">
       <button @click="gotolog" class="btn btn-log">Вход</button>

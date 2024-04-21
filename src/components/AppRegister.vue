@@ -49,9 +49,15 @@ export default {
       setTimeout(() => {
         document.cookie = new String();
         document.cookie = `id=${this.id}; max-age=2419200`;
+        if (this.status == 200) {
+          if (this.type == "student") {
+            this.$router.push({ name: "profile" });
+          } else {
+            this.$router.push({ name: "vuzregister" });
+          }
+        }
         this.message = "";
         this.status = "";
-        this.$router.push({ name: "profile" });
       }, 3000);
     },
 
@@ -62,8 +68,15 @@ export default {
         this.organization_id = this.$route.query.organization_id;
       }
     },
+
+    get_info() {
+      if (this.$route.type) {
+        this.type = this.$route.type;
+      }
+    },
   },
   mounted() {
+    this.get_info();
     this.get_id();
   },
 };

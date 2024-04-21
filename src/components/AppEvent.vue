@@ -1,51 +1,158 @@
 <script>
 import axios from "axios";
 import { defineComponent } from "vue";
+// import dayjs from "dayjs";
+import "dayjs/locale/ru";
+import { Carousel, Navigation, Slide, Pagination } from "vue3-carousel";
+
+import "vue3-carousel/dist/carousel.css";
 
 export default defineComponent({
-  components: {},
+  components: {
+    Carousel,
+    Slide,
+    Navigation,
+    Pagination,
+  },
   data() {
     return {
       id: "",
-      img: "",
+      img: [],
       desc: "",
+      name: "",
+      date: "",
+      type: "",
+      place: "",
+      reqs: [],
+      mems: [],
       message: "",
       status: "",
-      comments: [],
-      likes: 0,
-      userid: "",
-      name: "",
-      surname: "",
-      hash: "",
-      user: {},
-      likef: false,
-      textComment: "",
+      users: [],
+      admin: false,
+      users_mems: [],
     };
   },
   methods: {
     async load_info() {
+      let userid = this.getCookieValue("id");
+      let res = await axios.post(`/info-profile`, {
+        params: {
+          id: userid,
+        },
+      });
+      let typeuser = res.data.typeuser;
+      if (typeuser == "создатель вуза") {
+        this.admin = true;
+      } else {
+        this.admin = false;
+      }
       this.id = this.$route.query.id;
-      let response = await axios.post(`/get_entry`, {
+      let card = await axios.post(`/get_event`, {
         params: {
           id: this.id,
         },
       });
-
-      this.img = response.data.img;
-      this.desc = response.data.desc;
-      this.hash = response.data.hash;
-      console.log(response.data.comments.replace(/'/g, '"'));
-      if (response.data.comments) {
-        this.comments = JSON.parse(response.data.comments.replace(/'/g, '"'));
+      this.desc = card.data.desc;
+      this.img = JSON.parse(card.data.img.replace(/'/g, '"'));
+      this.name = card.data.name;
+      this.date = card.data.date;
+      this.type = card.data.type;
+      this.place = card.data.place;
+      this.reqs = JSON.parse(card.data.reqs.replace(/'/g, '"'));
+      this.mems = JSON.parse(card.data.mems.replace(/'/g, '"'));
+      if (this.reqs) {
+        this.reqs.forEach(async (id) => {
+          let response = await axios.post(`/info-profile`, {
+            params: {
+              id: id,
+            },
+          });
+          this.users.push({
+            id: id,
+            name: response.data.nameprof,
+            surname: response.data.surnameprof,
+            img: response.data.photoprof,
+          });
+        });
       }
-      this.likes = response.data.likes;
-      this.userid = response.data.userid;
-      let response2 = await axios.post(`/info-profile`, {
+      if (this.mems) {
+        this.mems.forEach(async (id) => {
+          let response = await axios.post(`/info-profile`, {
+            params: {
+              id: id,
+            },
+          });
+          this.users_mems.push({
+            id: id,
+            name: response.data.nameprof,
+            surname: response.data.surnameprof,
+            img: response.data.photoprof,
+          });
+        });
+      }
+    },
+
+    async create_req() {
+      let response = await axios.post(`/create_req`, {
         params: {
-          id: this.userid,
+          userid: this.getCookieValue("id"),
+          eventid: this.id,
         },
       });
-      this.name = response2.data.nameprof;
+      this.message = response.data.message;
+      this.status = response.data.status;
+      setTimeout(() => {
+        this.message = "";
+        this.status = "";
+        location.reload();
+      });
+    },
+    async getUser(id) {
+      let response = await axios.post(`/info-profile`, {
+        params: {
+          id: id,
+        },
+      });
+      let user = { name: "", surname: "" };
+      user.name = response.data.nameprof;
+      return user;
+    },
+    async confirm(id) {
+      console.log(id);
+      let response = await axios.post(`/set_mems`, {
+        params: {
+          userid: id,
+          eventid: this.id,
+          confirm: "True",
+          typeevent: this.type,
+        },
+      });
+      this.status = response.data.status;
+      this.message = response.data.message;
+      this.load_info();
+      setTimeout(() => {
+        this.status = "";
+        this.message = "";
+        location.reload();
+      }, 3000);
+    },
+    async reject(id) {
+      let response = await axios.post(`/set_mems`, {
+        params: {
+          userid: id,
+          eventid: this.id,
+          confirm: "False",
+          typeevent: this.type,
+        },
+      });
+      this.status = response.data.status;
+      this.message = response.data.message;
+      this.load_info();
+      setTimeout(() => {
+        this.status = "";
+        this.message = "";
+        location.reload();
+      }, 3000);
     },
     getCookieValue(name) {
       const cookies = document.cookie.split("; ");
@@ -58,59 +165,6 @@ export default defineComponent({
       }
       return res;
     },
-
-    async like() {
-      this.likef = true;
-      let response = await axios.post(`/set_like`, {
-        params: {
-          id: this.id,
-        },
-      });
-      let status = response.data.status;
-      if (status == 200) {
-        this.load_info();
-      }
-    },
-
-    async setComment() {
-      let id = this.getCookieValue("id");
-      let res = await axios.post(`/info-profile`, {
-        params: {
-          id: id,
-        },
-      });
-      let name = res.data.nameprof;
-      let surname = res.data.surnameprof;
-      let img = res.data.photoprof;
-      let response = await axios.post(`/set_koment`, {
-        params: {
-          id: this.id,
-          text: this.textComment,
-          name: name,
-          surname: surname,
-          img: img,
-          userid: id,
-        },
-      });
-      let status = response.data.status;
-      if (status == 200) {
-        this.load_info();
-        this.textComment = "";
-      }
-    },
-
-    async getUser(id) {
-      let response = await axios.post(`/info-profile`, {
-        params: {
-          id: id,
-        },
-      });
-      let user = { name: "", surname: "", img: "" };
-      user.name = response.data.nameprof;
-      user.surname = response.data.surnameprof;
-      user.img = response.data.photoprof;
-      return user;
-    },
   },
   mounted() {
     this.load_info();
@@ -119,15 +173,29 @@ export default defineComponent({
 </script>
 
 <template>
-  <h1>Запись</h1>
   <div class="card-wrapper">
     <div class="card">
       <div class="left">
         <div class="img">
-          <img :src="'/assets/' + img" alt="" />
+          <Carousel :autoplay="4000" :wrap-around="true">
+            <Slide v-for="slide in img" :key="slide">
+              <div class="carousel__item">
+                <img :src="`/assets/` + slide" alt="" />
+              </div>
+            </Slide>
+
+            <template #addons>
+              <Navigation />
+              <Pagination />
+            </template>
+          </Carousel>
         </div>
         <div class="info">
-          <div class="date">{{ hash }}</div>
+          <div class="nameWrapp">
+            <span class="title">{{ name }}</span>
+          </div>
+          <div class="place">{{ place }}</div>
+          <div class="date">{{ date }}</div>
         </div>
       </div>
       <div class="right">
@@ -136,14 +204,11 @@ export default defineComponent({
         </div>
       </div>
       <div class="reviews"></div>
-    </div>
-    <div @click="like" v-if="!likef" class="group-likes">
-      <span>{{ likes }}</span>
-      <img src="../assets/like.png" alt="" />
-    </div>
-    <div v-if="likef" class="group-likes likef">
-      <span>{{ likes }}</span>
-      <img src="../assets/like.png" alt="" />
+      <div class="button-wrapper">
+        <button @click="create_req" class="btn publish">
+          Отправить запрос на участие
+        </button>
+      </div>
     </div>
     <div v-if="message" class="notification-container">
       <div :class="{ error: status == 400, success: status == 200 }">
@@ -151,39 +216,46 @@ export default defineComponent({
       </div>
     </div>
   </div>
-  <div class="wrap-comment">
-    <h3>Оставьте комментарий</h3>
-    <div class="comment">
-      <textarea
-        v-model="textComment"
-        cols="30"
-        rows="10"
-        placeholder="Введите сообщение..."
-      ></textarea>
-      <img @click="setComment" src="../assets/send.png" alt="" />
-    </div>
-  </div>
-  <div class="wrap-reqs">
-    <h1>Комментарии</h1>
+  <div class="wrap-reqs" v-if="admin">
+    <h1>Запросы на участие</h1>
     <div class="reqs">
-      <div class="student" v-for="item in comments" :key="item">
+      <div class="student" v-for="item in users" :key="item">
         <div class="student-info">
           <img
-            @click="
-              this.$router.push({ name: 'profile', query: { id: item.userid } })
-            "
-            :src="'/assets/' + item.img"
+            @click="this.$router.push({ name: 'profile', query: { id: item } })"
+            :src="'/assets/' + item.img.slice(2, -2)"
             alt=""
           />
           <div
-            @click="
-              this.$router.push({ name: 'profile', query: { id: item.userid } })
-            "
+            @click="this.$router.push({ name: 'profile', query: { id: item } })"
             class="name"
           >
-            <span class="name2">{{ item.name + " " + item.surname }}</span>
-            <span>{{ item.text }}</span>
+            {{ item.name + " " + item.surname }}
           </div>
+        </div>
+        <div class="wrapper-btn">
+          <button @click="confirm(item.id)" class="btn publish">
+            Подтвердить
+          </button>
+          <button @click="reject(item.id)" class="btn btn-delete">
+            Отлонить
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="wrap-reqs" v-else>
+    <h1>Участники</h1>
+    <div class="reqs">
+      <div
+        @click="this.$router.push({ name: 'profile', query: { id: item } })"
+        class="student"
+        v-for="item in users_mems"
+        :key="item"
+      >
+        <div class="student-info">
+          <img src="../assets/no_photo.jpg" alt="" />
+          <div class="name">{{ item.name + " " + item.surname }}</div>
         </div>
       </div>
     </div>
@@ -191,76 +263,6 @@ export default defineComponent({
 </template>
 
 <style scoped>
-h3 {
-  font-size: 2rem;
-}
-.wrap-comment {
-  width: 80%;
-  display: flex;
-  flex-direction: column;
-  max-height: 100px;
-  margin: 0 auto;
-}
-
-.comment {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.comment img {
-  height: 30px !important;
-  width: auto !important;
-  cursor: pointer;
-
-  transition: all 400ms ease;
-}
-
-.comment img:hover {
-  transform: translateY(-5px);
-}
-
-.comment textarea {
-  border: 1px solid black;
-  border-radius: 15px;
-  padding: 10px 20px;
-  max-height: 100px;
-  width: 50%;
-}
-.likef {
-  background-color: black !important;
-  color: #fff !important;
-}
-.group-likes {
-  cursor: pointer;
-  padding: 7px;
-  border: 1px solid black;
-  border-radius: 10px;
-  position: absolute;
-  left: 5%;
-  bottom: 5%;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-
-  transition: all 400ms ease;
-}
-
-.group-likes:hover,
-.group-likes:active {
-  background-color: black;
-  color: #fff;
-}
-
-.group-likes img {
-  height: 30px !important;
-  width: auto !important;
-}
-
-h1 {
-  text-align: center;
-  font-size: 3rem;
-}
 .reqs {
   display: flex;
   gap: 10px;
@@ -289,7 +291,7 @@ h1 {
   font-size: 0.75rem;
 }
 
-.name2::after {
+.name::after {
   background-color: black; /* Цвет линии при наведении на нее курсора мыши */
   display: block;
   content: "";
@@ -299,8 +301,8 @@ h1 {
   -moz--transition: width 0.3s ease-in-out;
   transition: width 0.3s ease-in-out;
 }
-.name2:hover:after,
-.name2:focus:after {
+.name:hover:after,
+.name:focus:after {
   width: 100%;
 }
 
@@ -455,15 +457,9 @@ input[type="file"] {
   width: 50%;
 }
 
-.name {
-  display: flex;
-  flex-direction: column;
-}
-
 .nameWrapp {
   display: flex;
   justify-content: space-between;
-  gap: 10px;
 }
 .wrapper .card {
   width: 100%;
@@ -520,7 +516,6 @@ input[type="file"] {
 }
 
 .card-wrapper {
-  position: relative;
   margin: 0 auto;
   display: flex;
   justify-content: center;
@@ -580,7 +575,6 @@ input[type="file"] {
 img {
   width: 100%;
   border-radius: 5px;
-  max-width: 410px;
   height: 200px !important;
   object-fit: cover;
 }
@@ -594,12 +588,10 @@ img {
 }
 
 .date {
-  margin-top: 10px;
   font-size: 13px;
 }
 
 .body {
-  margin-top: 10px;
   display: flex;
   flex-direction: column;
   flex-grow: 1;

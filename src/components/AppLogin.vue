@@ -5,92 +5,37 @@ export default {
   components: {},
   data() {
     return {
-      name: "",
-      surname: "",
-      email: "",
-      organization_id: "1",
-      category_id: "1",
+      login: "",
       password: "",
-      sec_role: "sample_role",
-      error: "",
       status: 0,
-      last: 0,
-      success: false,
       message: "",
-      user: "",
-      type: "",
     };
   },
   methods: {
     async submit() {
-      if (this.password && this.name) {
-        let response = await axios.post(`/registration`, {
-          name: this.name,
-          surname: this.surname,
-          phone: this.phone,
-          email: this.email,
-          organization_id: this.organization_id,
-          category_id: this.category_id,
+      let response = await axios.post(`/login`, {
+        params: {
+          login: this.login,
           password: this.password,
-          sec_role: this.sec_role,
-        });
-        this.message = response.data.message;
-        this.success = response.data.success;
-        this.status = response.data.status;
-        this.error = response.data.err;
-        if (this.success) {
-          let response = await axios.post(`/login`, {
-            email: this.email,
-            password: this.password,
-          });
-          this.token = response.data.token;
-          this.success = response.data.success;
-          setTimeout(() => {
-            this.message = response.data.message;
-          }, 1500);
-          this.status = response.data.status;
-          this.user = response.data.user;
+        },
+      });
+      this.status = response.data.status;
+      this.message = response.data.message;
+      this.id = response.data.id;
+      if (this.status == 200) {
+        document.cookie = new String();
+        document.cookie = `id=${this.id}; max-age=2419200`;
+      }
+      setTimeout(() => {
+        if (this.status == 200) {
+          this.$router.push({ name: "profile", query: { id: this.id } });
         }
-        setTimeout(() => {
-          if (this.success) {
-            this.$refs.form.reset();
-            document.cookie = new String();
-            document.cookie = `token=${this.token}; max-age=2419200`;
-            document.cookie = `id=${this.user.id}; max-age=2419200`;
-            if (this.user.sec_role == "super") {
-              this.$router.push({ name: "supermenu" });
-            } else if (this.user.sec_role == "admin") {
-              this.$router.push({ name: "adminmenu" });
-            } else {
-              this.$router.push({ name: "menu" });
-            }
-          }
-          this.message = "";
-          this.success = "";
-          this.status = "";
-        }, 1500);
-        setTimeout(() => {
-          if (this.success) {
-            this.$refs.form.reset();
-            this.message = "";
-            this.success = "";
-            this.status = "";
-          }
-        }, 1500);
-      }
-    },
-
-    get_id() {
-      this.last = this.$route.query.last;
-      if (!this.last) {
-        this.category_id = this.$route.query.category_id;
-        this.organization_id = this.$route.query.organization_id;
-      }
+        this.status = "";
+        this.message = "";
+      }, 2500);
     },
   },
-  mounted() {
-    this.get_id();
-  },
+  mounted() {},
 };
 </script>
 
@@ -109,15 +54,19 @@ export default {
             <label for="" class="password">Пароль</label>
           </div>
           <div class="sign-up">
-            <button class="sign-up-btn" type="submit" id="sign-up">
+            <button
+              @click="submit"
+              class="sign-up-btn"
+              type="submit"
+              id="sign-up"
+            >
               Войти
             </button>
           </div>
-          <div
-            v-if="status"
-            :class="{ error: status == 400, success: status == 200 }"
-          >
-            {{ message }}
+        </div>
+        <div v-if="message" class="notification-container">
+          <div :class="{ error: status == 400, success: status == 200 }">
+            <span>{{ message }}</span>
           </div>
         </div>
       </div>
@@ -134,24 +83,27 @@ export default {
   margin: 0;
   color: black;
 }
+.notification-container {
+  position: fixed;
+  bottom: 3%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
 .success {
-  position: absolute;
-  bottom: 0%;
-  width: 300px;
-  text-align: center;
-  padding: 10px;
-  color: #a0dd75;
-  z-index: 10;
+  background-color: #87e752;
+  border-radius: 15px;
+  padding: 7px 12px;
+  color: #fff;
 }
 .error {
-  position: absolute;
-  bottom: 0%;
-  width: 300px;
-  text-align: center;
-  padding: 10px;
-  color: #dd7575;
-  z-index: 10;
+  background-color: #ed1c24;
+  border-radius: 15px;
+  padding: 7px 12px;
+  color: #fff;
+  font-weight: 550;
 }
 
 .container {

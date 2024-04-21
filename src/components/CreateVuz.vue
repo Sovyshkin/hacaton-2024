@@ -21,8 +21,8 @@ export default defineComponent({
       faculty: [{ counter: 1, depart: [""], name: "" }],
       name: "",
       adress: "",
-      status: "200",
-      message: "Успешно",
+      status: "",
+      message: "",
     };
   },
   methods: {
@@ -41,6 +41,17 @@ export default defineComponent({
         this.faculty[i].counter -= 1;
         this.faculty[i].depart.pop();
       }
+    },
+    getCookieValue(name) {
+      const cookies = document.cookie.split("; ");
+      let res;
+      for (let i = 0; i < cookies.length; i++) {
+        let cookie = cookies[i];
+        if (cookie.slice(0, 2) == name) {
+          res = cookie.replace(name + "=", "");
+        }
+      }
+      return res;
     },
     plus2(i) {
       this.faculty[i].counter += 1;
@@ -68,12 +79,13 @@ export default defineComponent({
           nameprof: this.name,
           geovuz: this.adress,
           fakprof: this.faculty,
+          userid: this.getCookieValue("id"),
         },
       });
       this.status = response.data.status;
       this.message = response.data.message;
       setTimeout(() => {
-        this.$router.push({ name: "profile" });
+        this.$router.push({ name: "vuz", query: { id: id, edit: true } });
       }, 3000);
     },
     url(file) {

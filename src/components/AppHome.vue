@@ -1,10 +1,28 @@
 <script>
+import axios from "axios";
+
 export default {
   name: "App",
   components: {},
-  data() {},
-  methods: {},
-  mounted() {},
+  data() {
+    return {
+      topstudents: [],
+    };
+  },
+  methods: {
+    async load_info() {
+      let response = await axios.post(`/get_top`);
+      console.log(response.data.topusers);
+      if (response.data.topusers) {
+        this.topstudents = JSON.parse(
+          response.data.topusers.replace(/'/g, '"')
+        );
+      }
+    },
+  },
+  mounted() {
+    this.load_info();
+  },
 };
 </script>
 <template>
@@ -34,15 +52,57 @@ export default {
     <div class="top-students">
       <span class="desc-title">ТОП студентов:</span>
       <div class="list-students">
-        <div class="student">
-          <img src="../assets/no_photo.jpg" alt="" />
-          <div class="student-info">Имя Фамилия</div>
+        <div
+          class="student"
+          @click="
+            this.$router.push({ name: 'profile', query: { id: item.id } })
+          "
+          v-for="item in topstudents"
+          :key="item"
+        >
+          <div class="left">
+            <img
+              src="../assets/no_photo.jpg"
+              class="ava"
+              :class="{ 'd-none': !item.photoprof.includes('no_photo') }"
+              alt=""
+            />
+            <img
+              :src="'/assets/' + item.photoprof"
+              :class="{ 'd-none': item.photoprof.includes('no_photo') }"
+              alt=""
+              class="ava"
+            />
+            <div class="student-info">
+              <span>{{ item.name + " " + item.surname }}</span>
+              <span>{{ item.vuzuser }}</span>
+            </div>
+          </div>
+          <div class="right">
+            <span>{{ item.zvezd }}</span>
+            <img src="../assets/star.png" class="star-ico" alt="" />
+          </div>
         </div>
       </div>
     </div>
   </div>
 </template>
 <style scoped>
+.left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.student-info {
+  display: flex;
+  flex-direction: column;
+}
 .wrap-home {
   width: 100%;
   display: flex;
@@ -102,16 +162,34 @@ export default {
 .list-students {
   display: flex;
   flex-direction: column;
+  gap: 10px;
+}
+
+.star-ico {
+  height: 30px !important;
 }
 
 .student {
   display: flex;
   align-items: center;
-  gap: 15px;
+  justify-content: space-between;
+  padding: 10px 20px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+  border-radius: 15px;
+  cursor: pointer;
+
+  transition: all 400ms ease;
 }
 
-.student img {
+.student:hover,
+.student:focus,
+.student:active {
+  transform: translateY(-5px);
+}
+
+.ava {
   height: 90px;
+  width: 90px;
   border-radius: 100%;
 }
 

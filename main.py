@@ -12,7 +12,7 @@ import ast
 BASE_PATH = os.path.dirname(os.path.realpath(__file__))
 
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='./dist', static_url_path='')
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
 version = "v1"
 
@@ -944,5 +944,5 @@ def getVuzid() -> json:
 
 
     
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=False, port=5010)# port=5010,
+# if __name__ == "__main__":
+#     app.run(host="0.0.0.0", debug=False, port=5010)# port=5010,

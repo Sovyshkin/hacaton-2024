@@ -929,6 +929,20 @@ def lentaEvent() -> json:
             lst.append({"id": el.id, "name": el.nameevent, "typeevent": el.typeevent, "place": el.place, "date": el.date, "vuzid": el.vuzid, "taskprof": el.taskprof, "photoprof": ast.literal_eval(el.photoprof), 'mems': ast.literal_eval(el.eventmems), 'reqs': ast.literal_eval(el.eventreq)})
     result['publication'] = str(lst)
     return jsonify(result)
+
+
+@app.route(f'/{version}/get_vuzid', methods=['POST', 'GET'])
+def getVuzid() -> json:
+    result = {}
+    data = request.get_json()
+    id = str(data['params']['id'])
+    onlyData = Data.query.all()
+    for el in onlyData:
+        if el.typeuser == 'вуз' and el.userid == id:
+            result['vuzid'] = el.id
+            return jsonify(result)
+
+
     
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=False, port=5010)# port=5010,

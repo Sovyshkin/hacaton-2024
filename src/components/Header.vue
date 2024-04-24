@@ -9,6 +9,7 @@ export default {
       id: this.getCookieValue("id"),
       vuz: "",
       adminvuz: false,
+      vuzid: "",
     };
   },
   methods: {
@@ -55,6 +56,7 @@ export default {
           name: "reg",
           query: {
             type: "vuz",
+            query: { id: this.vuzid },
           },
         });
       }
@@ -85,6 +87,13 @@ export default {
       let type = response.data.typeuser;
       if (type == "создатель вуза") {
         this.adminvuz = true;
+        let res = await axios.post(`/get_vuzid`, {
+          params: {
+            id: this.getCookieValue("id"),
+          },
+        });
+        this.vuzid = res.data.vuzid;
+        this.$router.push({ name: "vuz", query: { id: this.vuzid } });
       }
     },
   },
@@ -117,11 +126,7 @@ export default {
       >
         Мероприятия
       </div>
-      <div
-        @click="this.$router.push({ name: 'vuz' })"
-        v-if="adminvuz"
-        class="nav-item nav-small"
-      >
+      <div @click="getUser" v-if="adminvuz" class="nav-item nav-small">
         Мой ВУЗ
       </div>
       <div @click="goStudent" v-if="!id" class="nav-item nav-small">

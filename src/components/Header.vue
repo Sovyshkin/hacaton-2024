@@ -106,7 +106,7 @@ export default {
   <div class="wrap-header">
     <div class="nav" v-if="!target">
       <div @click="goHome" class="logo">
-        <img src="../assets/LOGO.png" alt="Лого" />
+        <img src="@/assets/LOGO.png" alt="Лого" />
       </div>
       <div @click="goVuz" v-if="!id" class="nav-item nav-small">ВУЗам</div>
       <div @click="goPred" v-if="!id" class="nav-item nav-small">

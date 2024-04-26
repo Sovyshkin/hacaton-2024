@@ -66,7 +66,7 @@ class Data(db.Model):
 
 
 
-@app.route(f'/{version}/login', methods=['POST', 'GET'])
+@app.route(f'/login', methods=['POST', 'GET'])
 def login() -> json:
     result = {}
     data = request.get_json()
@@ -104,7 +104,7 @@ def login() -> json:
     result['status'] = '400'
     return jsonify(result)    
 
-@app.route(f'/{version}/registration-prof', methods=['POST', 'GET'])
+@app.route(f'/registration-prof', methods=['POST', 'GET'])
 def registrationprof() -> json:
     result = {}
     data = request.get_json()
@@ -135,7 +135,7 @@ def registrationprof() -> json:
 
     return result
 
-@app.route(f'/{version}/registration-vuz', methods=['POST', 'GET'])
+@app.route(f'/registration-vuz', methods=['POST', 'GET'])
 def registrationvuz() -> json:
     data = request.get_json()
     nameprof = str(data['params']['nameprof']) 
@@ -170,7 +170,7 @@ def registrationvuz() -> json:
 
     
 
-@app.route(f'/{version}/registration-profvuz', methods=['POST', 'GET'])
+@app.route(f'/registration-profvuz', methods=['POST', 'GET'])
 def registrationprofvuz() -> json:
     result = {}
     data = request.get_json()
@@ -197,7 +197,7 @@ def registrationprofvuz() -> json:
 
     return jsonify(result)
 
-@app.route(f'/{version}/info-profile', methods=['POST', 'GET'])
+@app.route(f'/info-profile', methods=['POST', 'GET'])
 def infoprof() -> json:
     result = {}
     data = request.get_json()
@@ -237,7 +237,7 @@ def infoprof() -> json:
     result['status'] = '400'
     return jsonify(result) 
 
-@app.route(f'/{version}/upload', methods=['POST', 'GET'])
+@app.route(f'/upload', methods=['POST', 'GET'])
 def upload():
     result = {}
     id = request.form.get('id')
@@ -285,7 +285,7 @@ def upload():
                         result['message'] = 'Успешно'
                         return result
 
-@app.route(f'/{version}/new-entry', methods=['POST', 'GET'])
+@app.route(f'/new-entry', methods=['POST', 'GET'])
 def newEntry():
     result = {}
     userid = request.form.get('userid')
@@ -315,7 +315,7 @@ def newEntry():
     return jsonify(result)
 
 
-@app.route(f'/{version}/get_news', methods=['POST', 'GET'])
+@app.route(f'/get_news', methods=['POST', 'GET'])
 def getNews():
     result = {}
     data = request.get_json()
@@ -332,7 +332,7 @@ def getNews():
     return jsonify(result)    
 
 
-@app.route(f'/{version}/get_entry', methods=['POST', 'GET'])
+@app.route(f'/get_entry', methods=['POST', 'GET'])
 def getEntry():
     result = {}
     data = request.get_json()
@@ -353,7 +353,7 @@ def getEntry():
     result['message'] = 'Запись не найдена'
     return jsonify(result)    
 
-@app.route(f'/{version}/save_desc', methods=['POST', 'GET'])
+@app.route(f'/save_desc', methods=['POST', 'GET'])
 def saveDesk():
     result = {}
     data = request.get_json()
@@ -373,7 +373,7 @@ def saveDesk():
     result['status'] = '400'
     return jsonify(result)
 
-@app.route(f'/{version}/set_vuz', methods=['POST', 'GET'])
+@app.route(f'/set_vuz', methods=['POST', 'GET'])
 def steVuz():
     result = {}
     data = request.get_json()
@@ -393,7 +393,7 @@ def steVuz():
     result['status'] = '400'
     return jsonify(result)
 
-@app.route(f'/{version}/set_fak', methods=['POST', 'GET'])
+@app.route(f'/set_fak', methods=['POST', 'GET'])
 def steFak():
     result = {}
     data = request.get_json()
@@ -413,7 +413,7 @@ def steFak():
     result['status'] = '400'
     return jsonify(result)
 
-@app.route(f'/{version}/set_kaf', methods=['POST', 'GET'])
+@app.route(f'/set_kaf', methods=['POST', 'GET'])
 def steKaf():
     result = {}
     data = request.get_json()
@@ -434,7 +434,7 @@ def steKaf():
     return jsonify(result)
 
 
-@app.route(f'/{version}/get_vuzs', methods=['POST', 'GET'])
+@app.route(f'/get_vuzs', methods=['POST', 'GET'])
 def getVuzs():
     result = {}
     onlyData = Data.query.all()
@@ -448,7 +448,7 @@ def getVuzs():
     result['vuzs'] = str(allvuzs)
     return jsonify(result)
 
-@app.route(f'/{version}/get_vuz', methods=['POST', 'GET'])
+@app.route(f'/get_vuz', methods=['POST', 'GET'])
 def getVuz():
     result = {}
     data = request.get_json()
@@ -503,7 +503,7 @@ def getVuz():
         result['status'] = '400'
         return jsonify(result)    
 
-@app.route(f'/{version}/publish_event', methods=['POST', 'GET']) 
+@app.route(f'/publish_event', methods=['POST', 'GET']) 
 def ublishEvent(): 
     result = {} 
     userid = request.form.get('userid') 
@@ -537,7 +537,7 @@ def ublishEvent():
         result['status'] = '400' 
         return jsonify(result)
 
-@app.route(f'/{version}/get_events', methods=['POST', 'GET'])
+@app.route(f'/get_events', methods=['POST', 'GET'])
 def getEvents() -> json:
     result = {}
     data = request.get_json()
@@ -553,7 +553,7 @@ def getEvents() -> json:
     return jsonify(result)
 
 
-@app.route(f'/{version}/get_event', methods=['POST', 'GET'])
+@app.route(f'/get_event', methods=['POST', 'GET'])
 def getEvent() -> json:
     result = {}
     data = request.get_json()
@@ -577,7 +577,7 @@ def getEvent() -> json:
     return jsonify(result)
 
 
-@app.route(f'/{version}/set_like', methods=['POST', 'GET'])
+@app.route(f'/set_like', methods=['POST', 'GET'])
 def setLike() -> json:
     result = {}
     data = request.get_json()
@@ -599,7 +599,7 @@ def setLike() -> json:
     return jsonify(result)
 
     
-@app.route(f'/{version}/get_like', methods=['POST', 'GET'])
+@app.route(f'/get_like', methods=['POST', 'GET'])
 def getLike() -> json:
     result = {}
     data = request.get_json()
@@ -618,7 +618,7 @@ def getLike() -> json:
     return jsonify(result)
 
 
-@app.route(f'/{version}/set_koment', methods=['POST', 'GET'])
+@app.route(f'/set_koment', methods=['POST', 'GET'])
 def setKoment() -> json:
     result = {}
     data = request.get_json()
@@ -649,7 +649,7 @@ def setKoment() -> json:
     return jsonify(result)
 
 
-@app.route(f'/{version}/get_koment', methods=['POST', 'GET'])
+@app.route(f'/get_koment', methods=['POST', 'GET'])
 def getKoment() -> json:
     result = {}
     data = request.get_json()
@@ -668,7 +668,7 @@ def getKoment() -> json:
 
 
 
-# @app.route(f'/{version}/set_dostig', methods=['POST', 'GET'])
+# @app.route(f'/set_dostig', methods=['POST', 'GET'])
 # def setDostig() -> json:
 #     result = {}
 #     data = request.get_json()
@@ -727,7 +727,7 @@ def getKoment() -> json:
 #     return jsonify(result)
 
 
-@app.route(f'/{version}/get_top', methods=['POST', 'GET'])
+@app.route(f'/get_top', methods=['POST', 'GET'])
 def getTop() -> json:
     result = {}
     counter = 0
@@ -744,9 +744,10 @@ def getTop() -> json:
 
     onlyData = Data.query.order_by(Data.zvezdprof).all()
     usersTop = [] 
+    usersTop1 = []
 
     for el in onlyData:
-        if counter < 5 and str(el.typeuser) != 'вуз' and str(el.typeuser) != 'создатель вуза':
+        if str(el.typeuser) != 'вуз' and str(el.typeuser) != 'создатель вуза' and str(el.zvezdprof) != '0':
             src = ''
             namevuz = ''
             name = ''
@@ -763,14 +764,23 @@ def getTop() -> json:
                 surname = el.surnameprof
 
 
+            usersTop1.append({ "name": name, "surname": surname, "photoprof": src, "id": el.id, "zvezd": el.zvezdprof, "vuzuser": namevuz })
+            #counter += 1
+
+    sorted_data = sorted(usersTop1, key=lambda x: int(x["zvezd"]))
+
+    # Вывод отсортированного списка
+    for item in sorted_data:
+        if counter < 5:
             usersTop.append({ "name": name, "surname": surname, "photoprof": src, "id": el.id, "zvezd": el.zvezdprof, "vuzuser": namevuz })
             counter += 1
+        print(item)
         if counter > 5:
             break 
     result['topusers'] = str(usersTop)
     return result
 
-@app.route(f'/{version}/create_req', methods=['POST', 'GET'])
+@app.route(f'/create_req', methods=['POST', 'GET'])
 def createRreq() -> json:
     result = {}
     data = request.get_json()
@@ -794,7 +804,7 @@ def createRreq() -> json:
     result['status'] = '400' 
     return jsonify(result)
 
-@app.route(f'/{version}/set_mems', methods=['POST', 'GET'])
+@app.route(f'/set_mems', methods=['POST', 'GET'])
 def setMems() -> json:
     result = {}
     data = request.get_json()
@@ -886,7 +896,7 @@ def setMems() -> json:
     return jsonify(result)
 
 
-@app.route(f'/{version}/search', methods=['POST', 'GET'])
+@app.route(f'/search', methods=['POST', 'GET'])
 def search() -> json:
     result = {}
     data = request.get_json()
@@ -907,7 +917,7 @@ def search() -> json:
     result['status'] = '400' 
     return jsonify(result)
 
-@app.route(f'/{version}/lenta', methods=['POST', 'GET'])
+@app.route(f'/lenta', methods=['POST', 'GET'])
 def lenta() -> json:
     result = {}
     lst = []
@@ -919,7 +929,7 @@ def lenta() -> json:
     result['publication'] = str(lst)
     return jsonify(result)
 
-@app.route(f'/{version}/lenta_events', methods=['POST', 'GET'])
+@app.route(f'/lenta_events', methods=['POST', 'GET'])
 def lentaEvent() -> json:
     result = {}
     lst = []
@@ -931,7 +941,7 @@ def lentaEvent() -> json:
     return jsonify(result)
 
 
-@app.route(f'/{version}/get_vuzid', methods=['POST', 'GET'])
+@app.route(f'/get_vuzid', methods=['POST', 'GET'])
 def getVuzid() -> json:
     result = {}
     data = request.get_json()
